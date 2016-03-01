@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <style>h4 {color: #0088cc}</style>
+
+<script>
+    $(function(){
+        {% if form.errors %}
+        $('#myModal').modal('show');
+        {% endif %}
+
+        $("#action_form_btn").click(function(){
+            var ajax_option={url:"/ticketmgr/create_action/{{ incident.id }}/", type:"POST", success:function(data){$(".modal-content").innerHTML=data}}
+            $("#action_form".ajaxSubmit())
+
+        })
+
+        $("#id_assign_to_user").typeahead({
+            source:  function(query, process){
+            var department_val = $("#id_assign_to_dep").val()
+            var owner_val = $("#id_assign_to_user").val()
+            $.ajax({
+                type:"GET",
+                url:"/ticketmgr/user_hint/",
+                data:{department:department_val, owner_hint: owner_val},
+                dataType:"json",
+                success: function(result){
+{#                    alert("hh")#}
+                    process(result.user_list);
+                },
+                error: function(){alert("eeee")}
+            })
+        }})
+
+    $("[data-toggle='popover']").popover();
+
+
+    });
+</script>
+
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h1 class="panel-title" style="display: inline"> 故障内容 ( 当前状态：{{ incident.get_status_display }} )</h1>
+                <button class="btn btn-info btn-sm col-md-offset-1" onclick="location='{% url 'update_incident' incident.id %}'">编辑</button>
+        </div>
+{#    <div class="row">#}
+{##}
+{#            <button class="btn btn-info btn-sm" onclick="location='{% url 'update_incident' incident.id %}'">编辑</button>#}
+{#        </span>#}
+{#    </div>#}
+{#    <hr/>#}
+    <div class="panel-body">
+    <table class="table">
+        <tr>
+            <td style="border: none"><h4>设备信息</h4></td>
+        <tr>
+                <td> 设备编码: </td>
+                <td> {{ incident.terminal_no.terminal_no }}</td>
+                <td> 安装地址: </td>
+                <td> {{ incident.terminal_no.terminal_location }}</td>
+        </tr>
+        <tr>
+            <td> 设备名称: </td>
+            <td>{{ incident.terminal_no.terminal_name }}</td>
+            <td> 安装时间: </td>
+            <td>{{ incident.terminal_no.install_time|date:"Y-m-d" }}</td>
+        </tr>
+
+        <tr>
+            <td style="border: none"><h4>投递信息</h4></td>
+        </tr>
+        <tr>
+                <td> 包裹号码: </td>
+                <td> {{ incident.package_id }}</td>
+                <td> 投递箱格: </td>
+                <td> {{ incident.box_no }}</td>
+        </tr>
+        <tr>
+                <td> 收件人手机: </td>
+                <td> {{ incident.postman_mobile }}</td>
+                <td> 投递员手机: </td>
+                <td> {{ incident.take_mobile }}</td>
+        </tr>
+        <tr>
+                <td> 投递时间: </td>
+                <td> {{ incident.deliver_time }}</td>
+                <td> 取件时间: </td>
+                <td> {{ incident.take_time }}</td>
+        </tr>
+
+
+        <tr><td style="border: none"><h4>故障信息</h4></td></tr>
+        <tr>
+            <td> 故障描述: </td>
+            <td>{{ incident.descrip }}</td>
+            <td> 问题备注: </td>
+            <td>{{ incident.remark }}</td>
+        </tr>
+        <tr>
+            <td> 创建人:</td>
+            <td>{{ incident.creator.userprofile.username_cn }}</td>
+            <td> 创建时间: </td>
+            <td>{{ incident.cdate|date:"Y-m-d" }}</td>
+
+        </tr>
+        <tr>
+            <td> 当前所有者: </td>
+            <td>{{ incident.owner.userprofile.username_cn }}</td>
+            <td> 更新时间: </td>
+            <td>{{ incident.upddate|date:"Y-m-d" }}</td>
+        </tr>
+
+    </table>
+
+    <table class="table">
+        <tr><td style="border: none"><h4>处理信息</h4></td></tr>
+        <tr>
+            <td>处理时间</td><td>处理描述</td><td>处理类型</td><td>操作人</td><td>转至</td>
+        </tr>
+
+            {%  for act in action %}
+                <tr>
+                    <td>{{ act.action_time|date:"Y-m-d H:i:s" }}</td>
+                    <td><div data-toggle="popover" data-placement="top" data-content="{{ act.action_detail }}" title="处理详情：">{{ act.action_brief }}</div></td>
+                    <td>{{ act.get_action_type_display }}</td>
+                    <td>{{ act.creator.userprofile.username_cn }}</td>
+                    <td>{{ act.assign_to_user.userprofile.username_cn }}</td>
+                </tr>
+            {% endfor %}
+    </table>
+{#<a href="/ticketmgr/create_action/{{ incident.id }}/" class="btn btn-info btn-group-sm" data-toggle="modal" data-target="#myModal">新建处理</a>#}
+<button class="btn btn-info btn-group-sm" data-toggle="modal" data-target="#myModal">新建处理</button>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content col-md-12" style="padding-top: 15px">
+{#        <div class="container " style="padding-top: 20px; padding-bottom: 20px">#}
+         <div class="panel panel-primary ">
+        <div class="panel-heading">
+            <h1 class="panel-title"> 新建处理 </h1>
+        </div>
+        <div class="panel-body">
+            <form id="action_form" method="post" action="/ticketmgr/create_action/{{ incident.id }}/">
+{#                <div class="col-xs-6">#}
+                {% csrf_token %}
+                {{ form.as_p }}
+
+                <input class="btn btn-primary" type="submit" name="submit" value="Create Action" />
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+{#                </div>#}
+            </form>
+            </div>
+            </div>
+        </div>
+{#      <div class="modal-header">#}
+{#        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>#}
+{#        <h4 class="modal-title">New Action</h4>#}
+{#      </div>#}
+{#      <div class="modal-body">#}
+{#        <p>One fine body…</p>#}
+{#      </div>#}
+{#      <div class="modal-footer">#}
+{#        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>#}
+{#        <button type="button" class="btn btn-primary">Save changes</button>#}
+{#      </div>#}
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+</div>
+</div>
+{% endblock %}

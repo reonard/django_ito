@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.0/css/bootstrap.min.css">
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    {% load staticfiles %}
+    <script src="{% static "js/bootstrap3-typeahead.min.js" %}"></script>
+</head>
+<body>
+
+<div class="container" style="padding-top: 20px">
+
+<div class="row">
+ <ul class="nav nav-tabs navbar-left col-md-offset-5">
+     <li class="navbar-brand">中集电商</li>
+     <li class="active"><a href="/ticketmgr/index/">故障记录</a></li>
+     <li><a href="#">问题跟踪</a></li>
+     <li><a href="#">报警记录</a></li>
+     <li><a href="#">图表统计</a></li>
+     <li><a href="#">设备维护</a></li>
+ </ul>
+    <button class="btn btn-primary btn-sm pull-right" onclick="location='{% url 'logout' %}'">Logout</button>
+
+</div>
+
+<div class="container">
+    <div class="row">
+        <hr style="width:100%;padding-left:0;border-top:2px ridge green">
+    </div>
+
+{% block content %}
+{% endblock %}
+<div>
+</div>
+</body>
+</html>

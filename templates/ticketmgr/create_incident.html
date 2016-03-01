@@ -1,0 +1,85 @@
+{#<!DOCTYPE html>#}
+{#<html>#}
+{#<head lang="en">#}
+{#    <meta charset="UTF-8">#}
+{#    <title></title>#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.0/css/bootstrap.min.css">#}
+{#    <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>#}
+{#    <script src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>#}
+{#    {% load staticfiles %}#}
+{#    <script src="{% static "js/bootstrap3-typeahead.min.js" %}"></script>#}
+{#    <script src="{% static "js/bootstrap-datetimepicker.min.js" %}"></script>#}
+{#    <style type="text/css">@import "{% static "css/bootstrap-datetimepicker.min.css" %}" ;</style>#}
+{##}
+{#</head>#}
+{% extends "base.html" %}
+
+{% block content %}
+
+    {% load staticfiles %}
+    <script src="{% static "js/bootstrap3-typeahead.min.js" %}"></script>
+    <script src="{% static "js/bootstrap-datetimepicker.min.js" %}"></script>
+    <script src="{% static "js/ticketmgr.js" %}"></script>
+    <style type="text/css">@import "{% static "css/bootstrap-datetimepicker.min.css" %}" ;</style>
+
+<script>
+{#    $(function() {#}
+{#        $("#id_terminal_no").keyup(function () {#}
+{#            var terminal_no_val = $("#id_terminal_no").val()#}
+{#            $.ajax({#}
+{#                type:"GET",#}
+{#                url:"/ticketmgr/get_terminal_info/",#}
+{#                data:{terminal_no:terminal_no_val},#}
+{#                dataType:"json",#}
+{#                success:function(result){#}
+{#                    $("#id_terminal_name").text(result.terminal_name)#}
+{#                    $("#id_terminal_location").text(result.terminal_location)#}
+{#                }#}
+{#            })#}
+{#        })#}
+{##}
+{#        $('#id_deliver_time,#id_take_time').datetimepicker({format: 'yyyy/mm/dd hh:ii:ss'});#}
+{##}
+{#        $("#id_owner").typeahead({#}
+{#            source:  function(query, process){#}
+{#            var department_val = $("#id_department").val()#}
+{#            var owner_val = $("#id_owner").val()#}
+{#            $.ajax({#}
+{#                type:"GET",#}
+{#                url:"/ticketmgr/user_hint/",#}
+{#                data:{department:department_val, owner_hint: owner_val},#}
+{#                dataType:"json",#}
+{#                success: function(result){#}
+{#                    process(result.user_list);#}
+{#                },#}
+{#                error: function(){alert("eeee")}#}
+{#            })#}
+{#        }})#}
+{##}
+{##}
+{#    })#}
+    $(function(){
+
+    })
+
+</script>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h1 class="panel-title"> 新建故障 </h1>
+        </div>
+        <div class="panel-body">
+            <form id="incident_form" method="post" action="/ticketmgr/create_incident/">
+                <div class="col-xs-8">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <p><label>Terminal Name:&nbsp</label><span id="id_terminal_name"></span></p>
+                <p><label>Terminal Location:&nbsp</label> <span id="id_terminal_location"></span></p>
+                <input class="btn btn-info" type="submit" name="submit" value="Create Incident" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
