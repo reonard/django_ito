@@ -42,7 +42,7 @@
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h1 class="panel-title" style="display: inline"> 故障内容 ( 当前状态：{{ incident.get_status_display }} )</h1>
-                <button class="btn btn-info btn-sm col-md-offset-1" onclick="location='{% url 'update_incident' incident.id %}'">编辑</button>
+                <button class="btn btn-info btn-sm col-md-offset-1" onclick="location='{% url 'ticketmgr:update_incident' incident.id %}'">编辑</button>
         </div>
 {#    <div class="row">#}
 {##}

@@ -45,20 +45,26 @@
 # con.close()
 
 
-class A:
-    def __init__(self):
-        self.kk= "a"
-        self.bb= "c"
+# class A:
+#     def __init__(self):
+#         self.kk= "a"
+#         self.bb= "c"
+#
+#     def update_s(self, **kwargs):
+#         for k, v in kwargs.items():
+#             print k, v
+#             self.k = v
+#             self.__dict__.update()
+#
+#
+#
+# a = A()
+# a.update_s(kk="c")
+# print
+# print a.__dict__
 
-    def update_s(self, **kwargs):
-        for k, v in kwargs.items():
-            print k, v
-            self.k = v
-            self.__dict__.update()
 
 
+import MySQLdb
 
-a = A()
-a.update_s(kk="c")
-print
-print a.__dict__
+con  = MySQLdb.connect("127.0.0.1", '')

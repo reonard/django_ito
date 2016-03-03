@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app.comm',
     'app.ticketmgr',
+    'app.errorMonitor'
 ]
 
 MIDDLEWARE_CLASSES = [

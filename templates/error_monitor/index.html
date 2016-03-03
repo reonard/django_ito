@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block header %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/t/bs-3.3.6/jq-2.2.0,dt-1.10.11/datatables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/t/bs-3.3.6/jq-2.2.0,dt-1.10.11/datatables.min.js"></script>
+        <script>
+
+        function format ( d ) {
+
+        return '<table class="table" style="padding-left:50px;">'+
+        '<tr>'+
+            '<td style="width: 100px; border: none" >警告类型：</td>'+
+            '<td style="border: none">'+d.error_type__errorType+'</td>'+
+        '</tr>'+
+
+        '<tr>'+
+            '<td>警告详情：</td>'+
+            '<td>'+d.error_msg+'</td>'+
+        '</tr>'+
+    '</table>';
+}
+
+    $(function()
+    {
+        var table = $("#table_id").DataTable({
+            "processing":true,
+            "serverSide":true,
+            "ajax":"/errormonitor/error_list/",
+            "columns": [
+            {
+                className:'details-control',
+                orderable:false,
+                data:null,
+                defaultContent: ''
+            },
+                        {data:"app__app_name"},
+                        {data:"server_ip"},
+                        {data:"level"},
+                        {data:"error_key__error_name"}
+            ],
+
+            "order": [[1, 'asc']]
+            });
+
+        $("#table_id tbody").on("click","td.details-control",function(){
+            var tr = $(this).closest("tr");
+            var row = table.row(tr);
+            if (row.child.isShown())
+            {
+                row.child.hide();
+                tr.removeClass("shown");
+            }
+            else
+            {
+                row.child(format(row.data()) ).show();
+                tr.addClass("shown")
+            }
+        })
+
+    })
+    </script>
+
+    <style>
+        td.details-control {
+        background: url('http://datatables.club/example/resources/details_open.png') no-repeat center center;
+        cursor: pointer;}
+
+        tr.shown td.details-control {
+        background: url('http://datatables.club/example/resources/details_close.png') no-repeat center center;
+        }
+    </style>
+
+{% endblock %}
+
+
+{% block content %}
+
+    <table id="table_id" class="table table-hover">
+    <thead>
+        <tr class="info">
+            <th></th>
+            <th>应用名称</th>
+            <th>服务器地址</th>
+            <th>警告等级</th>
+            <th>警告描述</th>
+        </tr>
+    </thead>
+{#    <tbody>#}
+{#        <tr>#}
+{#            <td>Row 1 Data 1</td>#}
+{#            <td>Row 1 Data 2</td>#}
+{#        </tr>#}
+{#        <tr>#}
+{#            <td>Row 2 Data 1</td>#}
+{#            <td>Row 2 Data 2</td>#}
+{#        </tr>#}
+{#    </tbody>#}
+</table>
+
+{% endblock %}

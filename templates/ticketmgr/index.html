@@ -25,7 +25,7 @@
                 {% if incidents %}
                     {% for incident in incidents %}
                         <tr>
-                            <td><a href="{% url 'show_ticket' incident.id %}">{{ incident.id }}</a></td>
+                            <td><a href="{% url 'ticketmgr:show_ticket' incident.id %}">{{ incident.id }}</a></td>
                             <td>{{ incident.terminal_no.terminal_no }}</td>
                             <td>{{ incident.terminal_no.terminal_name }}</td>
                             <td>{{ incident.terminal_no.terminal_location }}</td>
@@ -44,7 +44,7 @@
 
     <div class="row">
     <span class="col-md-1">
-        <button class="btn btn-primary" onclick="location='{% url 'create_incident' %}'">Create New</button>
+        <button class="btn btn-primary" onclick="location='{% url 'ticketmgr:create_incident' %}'">Create New</button>
     </span>
 
     <span class="col-md-3 col-md-offset-8">
