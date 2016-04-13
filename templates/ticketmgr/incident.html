@@ -25,7 +25,6 @@
                 data:{department:department_val, owner_hint: owner_val},
                 dataType:"json",
                 success: function(result){
-{#                    alert("hh")#}
                     process(result.user_list);
                 },
                 error: function(){alert("eeee")}
@@ -34,16 +33,31 @@
 
     $("[data-toggle='popover']").popover();
 
+    $("#id_assign_to_dep, #id_assign_to_user").parent().hide();
 
+    $("#id_action_type").change(function(){ if ($("#id_action_type option:selected").val() == 4)
+                                            { $("#id_assign_to_dep, #id_assign_to_user").parent().show()}
+                                            else{$("#id_assign_to_dep, #id_assign_to_user").parent().hide()}})
+
+
+    $("#id_assign_to_dep").change( function() {
+        $("#id_assign_to_user").val("");
+        if($("#id_assign_to_dep option:selected").val()==2)
+        {autofil_maitainer({{ incident.terminal_no.terminal_no }}, $("#id_assign_to_user"))}})
+
+    $("#btn_takeover").click(function(){
+        $("#id_action_type").val("2");
+        $("#id_action_brief").val("开始处理");
+        $("#action_form").submit()})
     });
 </script>
 
 
-    <div class="panel panel-primary">
+    <div class="panel panel-info">
         <div class="panel-heading">
             <h1 class="panel-title" style="display: inline"> 故障内容 ( 当前状态：{{ incident.get_status_display }} )</h1>
-                <button class="btn btn-info btn-sm col-md-offset-1" onclick="location='{% url 'ticketmgr:update_incident' incident.id %}'">编辑</button>
         </div>
+
 {#    <div class="row">#}
 {##}
 {#            <button class="btn btn-info btn-sm" onclick="location='{% url 'update_incident' incident.id %}'">编辑</button>#}
@@ -51,6 +65,7 @@
 {#    </div>#}
 {#    <hr/>#}
     <div class="panel-body">
+
     <table class="table">
         <tr>
             <td style="border: none"><h4>设备信息</h4></td>
@@ -84,9 +99,9 @@
         </tr>
         <tr>
                 <td> 投递时间: </td>
-                <td> {{ incident.deliver_time }}</td>
+                <td> {{ incident.deliver_time |date:"Y-m-d H:i:s"}}</td>
                 <td> 取件时间: </td>
-                <td> {{ incident.take_time }}</td>
+                <td> {{ incident.take_time|date:"Y-m-d H:i:s"}}</td>
         </tr>
 
 
@@ -101,19 +116,34 @@
             <td> 创建人:</td>
             <td>{{ incident.creator.userprofile.username_cn }}</td>
             <td> 创建时间: </td>
-            <td>{{ incident.cdate|date:"Y-m-d" }}</td>
+            <td>{{ incident.cdate|date:"Y-m-d H:i:s" }}</td>
 
         </tr>
         <tr>
             <td> 当前所有者: </td>
             <td>{{ incident.owner.userprofile.username_cn }}</td>
             <td> 更新时间: </td>
-            <td>{{ incident.upddate|date:"Y-m-d" }}</td>
+            <td>{{ incident.upddate|date:"Y-m-d H:i:s" }}</td>
+        </tr>
+        <tr>
+            <td> 关联问题：</td>
+            <td><a href="/issuemgr/detail/{{ incident.relate_to_prob.id }}">{{ incident.relate_to_prob }}</a></td>
+            <td> 解决时间: </td>
+            <td>{{ incident.resolve_time|date:"Y-m-d H:i:s" }}</td>
         </tr>
 
     </table>
+    <div class="row">
+       <div class="col-md-offset-5 col-sm-offset-5">
+           <button class="btn btn-info btn-sm col-md-2 col-sm-2" onclick="location='{% url 'ticketmgr:update_incident' incident.id %}'">编 辑</button>
+       </div>
+    </div>
 
-    <table class="table">
+    <div class="row">
+        <hr style="width:98%;border-top:2px ridge green">
+    </div>
+
+        <table class="table">
         <tr><td style="border: none"><h4>处理信息</h4></td></tr>
         <tr>
             <td>处理时间</td><td>处理描述</td><td>处理类型</td><td>操作人</td><td>转至</td>
@@ -129,8 +159,12 @@
                 </tr>
             {% endfor %}
     </table>
-{#<a href="/ticketmgr/create_action/{{ incident.id }}/" class="btn btn-info btn-group-sm" data-toggle="modal" data-target="#myModal">新建处理</a>#}
-<button class="btn btn-info btn-group-sm" data-toggle="modal" data-target="#myModal">新建处理</button>
+{% if incident.status == "4" or incident.status == "0" %}
+    <button id="btn_takeover" class="btn btn-info">开始处理</button>
+{% elif incident.status != "1" %}
+    <button class="btn btn-info btn-group-sm" data-toggle="modal" data-target="#myModal">新建处理</button>
+{% endif %}
+
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content col-md-12" style="padding-top: 15px">
@@ -144,8 +178,7 @@
 {#                <div class="col-xs-6">#}
                 {% csrf_token %}
                 {{ form.as_p }}
-
-                <input class="btn btn-primary" type="submit" name="submit" value="Create Action" />
+                <input class="btn btn-primary" type="submit"  value="Create Action" />
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
 {#                </div>#}
             </form>

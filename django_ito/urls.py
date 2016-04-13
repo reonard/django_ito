@@ -17,24 +17,16 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.auth.views import login, logout
-
-from app.ticketmgr.views import index, create_incident, show_ticket, update_incident, create_action
-from app.comm.views import get_terminal_info, error_no_perm, get_owner
+from app.comm.views import error_no_perm, get_owner
 
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/login/', login, {'template_name': 'login.html'}, name='login'),
     url(r'^accounts/logout/', logout, {'template_name': 'logout.html'}, name='logout'),
-    # url(r'^ticketmgr/user_hint/$', get_owner),
-    # url(r'^ticketmgr/get_terminal_info/$', get_terminal_info),
     url(r'^user_hint/$', get_owner),
-    # url(r'^ticketmgr/index/$', index, name='index'),
-    # url(r'^ticketmgr/detail/([0-9]+)/$', show_ticket, name='show_ticket'),
-    # url(r'^ticketmgr/create_incident/$', create_incident, name='create_incident'),
-    # url(r'^ticketmgr/update_incident/([0-9]+)/$', update_incident, name='update_incident'),
-    # url(r'^ticketmgr/create_action/([0-9]+)/$', create_action, name='create_action'),
     url(r'^error_no_perm/$', error_no_perm),
     url(r'^ticketmgr/', include('app.ticketmgr.urls', namespace='ticketmgr')),
-    url(r'^errormonitor/', include('app.errorMonitor.urls', namespace='errormonitor'))
+    url(r'^errormonitor/', include('app.errorMonitor.urls', namespace='errormonitor')),
+    url(r'^issuemgr/', include('app.issuemgr.urls', namespace='issuemgr')),
 ]

@@ -4,21 +4,29 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
 
-from app.comm.models import BaseTicket, BaseTerminalInfo, BaseDepartment
-
-
+from app.comm.models import BaseTicket, BaseTerminalInfo, BaseDepartment, BaseAction
+from app.comm.global_settings import MAIL_TEMPLATE, MIALSUBJECT
+from app.issuemgr.models import Problem, Cause
+from app.comm.tasks import async_sendmail
 
 # Create your models here.
 
 ticketType = (('I', 'Incident'), ('P', 'Problem'), ('S', 'ServiceRequest'))
-actionType = (('1', 'Re-Assign'), ('2', 'Resolve'), ('3', 'Suspend'), ('4', 'Takeover'), ('5', 'Close'))
-statusType = (('0', 'Created'),
-              ('1', 'Waiting'), ('2', 'Resolved'), ('3', 'Pending'), ('4', 'Handling'), ('5', 'Closed'))
+# statusType = (('0', '新建'),
+#               ('1', '等待接手'), ('2', '已解决'), ('3', '搁置中'), ('4', '处理中'), ('5', '已重开'))
+sourceType = (('0', '客服电话'), ('1', '微信'), ('2', '运维反馈'), ('3', '其他'))
 
-sourceType = (('0', 'ServicePhone'), ('1', 'WeChat'), ('2', 'Operator'), ('3', 'Other'))
+
+def get_display(choices, key):
+    def _get_display(item):
+        item[key] = dict(choices)[str(item[key])]
+    return _get_display
 
 
 class Incident(BaseTicket):
+    resolve_time = models.DateTimeField(null=True)
+    relate_to_prob = models.ForeignKey(Problem, null=True, blank=True)
+    major_cause = models.ForeignKey(Cause, null=True, blank=True)
     terminal_no = models.ForeignKey(BaseTerminalInfo)
     owner = models.ForeignKey(User, related_name="incident_owner")
     package_id = models.CharField(max_length=50, blank=True)
@@ -35,29 +43,23 @@ class Incident(BaseTicket):
         self.__dict__.update(kwargs)
         print self.__dict__
 
+    def re_assign(self, user):
+        self.owner = user
+
+    def update_status(self, status):
+        self.status = status
+
+    def link_to_problem(self, problem):
+        self.relate_to_prob = problem
+
+    def notify_user(self, action_type):
+        msg_content = MAIL_TEMPLATE[action_type].format(incident=self)
+        msg_subject = MIALSUBJECT[action_type].format(incident=self)
+        receiver = self.owner.email
+        async_sendmail.delay(msg_subject, msg_content, (receiver,))
+
     def __unicode__(self):
         return self.descrip
-
-
-class Problem(BaseTicket):
-    pass
-
-
-class ServReq(BaseTicket):
-    pass
-
-
-class BaseAction(models.Model):
-    action_type = models.CharField(max_length=30, choices=actionType)
-    action_brief = models.CharField(max_length=64, blank=True, verbose_name="Action Brief")
-    action_detail = models.TextField(max_length=256, blank=True, verbose_name="Action Detail")
-    action_time = models.DateTimeField(auto_now=True)
-
-    def update(self, **kwargs):
-        self.__dict__.update(kwargs)
-
-    class Meta:
-        abstract = True
 
 
 class IncidentAction(BaseAction):
@@ -65,6 +67,5 @@ class IncidentAction(BaseAction):
     assign_to_dep = models.ForeignKey(BaseDepartment, blank=True, null=True)
     assign_to_user = models.ForeignKey(User, blank=True, null=True)
     creator = models.ForeignKey(User, related_name="incident_action_creator")
-
 
 

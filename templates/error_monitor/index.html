@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block header %}
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/t/bs-3.3.6/jq-2.2.0,dt-1.10.11/datatables.min.css"/>
-    <script type="text/javascript" src="https://cdn.datatables.net/t/bs-3.3.6/jq-2.2.0,dt-1.10.11/datatables.min.js"></script>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static "css/datatables.css" %}"><script type="text/javascript" src="https://cdn.datatables.net/t/bs-3.3.6/jq-2.2.0,dt-1.10.11/datatables.min.js"></script>
         <script>
 
         function format ( d ) {
@@ -25,6 +25,7 @@
         var table = $("#table_id").DataTable({
             "processing":true,
             "serverSide":true,
+{#            "dom": '<"#top"lf><t>ip',#}
             "ajax":"/errormonitor/error_list/",
             "columns": [
             {

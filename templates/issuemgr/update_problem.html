@@ -7,12 +7,12 @@
     <script src="{% static "js/ticketmgr.js" %}"></script>
     <style type="text/css">@import "{% static "css/bootstrap-datetimepicker.min.css" %}" ;</style>
 
-<div class="panel panel-info">
+<div class="panel panel-primary">
     <div class="panel-heading">
-        <h1 class="panel-title"> 更新故障 </h1>
+        <h1 class="panel-title"> 更新问题 </h1>
     </div>
 <div class="panel-body">
-<form id="problem_form" method="post" >
+<form id="incident_form" method="post" >
     {% csrf_token %}
     {{ form.as_p }}
 {#    {% for field in form.visible_fields %}#}
@@ -20,7 +20,7 @@
 {#        {{ field.help_text }}#}
 {#        {{ field }}#}
 {#    {%  endfor %}#}
-    <input class="btn btn-info" type="submit" name="submit" value="更新故障" />
+    <input class="btn btn-info" type="submit" name="submit" value="Update Problem" />
 </form>
 </div>
 </div>

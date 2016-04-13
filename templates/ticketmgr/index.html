@@ -1,11 +1,108 @@
 {% extends "base.html" %}
 
+{% block header %}
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static "css/datatables.css" %}">
+{#<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/t/bs-3.3.6/jq-2.2.0,dt-1.10.11/datatables.css"/>#}
+<script type="text/javascript" src="https://cdn.datatables.net/t/bs-3.3.6/jq-2.2.0,dt-1.10.11/datatables.js"></script>
+<script type="text/javascript">
+
+    $(function()
+    {
+        var table = $("#incident_table").DataTable({
+            "processing":false,
+            "dom": '<<"create_new">l<"status_filter"><"priority_filter"><"department_filter"><"problem_filter"><"owner_filter">><t>ip',
+            "serverSide":true,
+            "ajax":{
+                "url":"/ticketmgr/get_incident_list/",
+                "data":function(d) {
+                    d.filter_priority=$("#priority_filter option:selected").val()
+                    d.filter_status = $("#status_filter option:selected").val()
+                    d.filter_department = $("#dep_filter option:selected").val()
+                    d.filter_all = $("#owner_filter").prop("checked")
+                    d.filter_problem = $("#problem_filter option:selected").val()
+                }
+            },
+            "columns": [
+                        {data:"id" ,
+                            "render": function(data){
+                                return '<a href=/ticketmgr/detail/'+data+'>'+data+'</a>'},
+                            "targets": 0},
+                        {data:"terminal_no__terminal_no"},
+                        {data:"terminal_no__terminal_name"},
+                        {data:"terminal_no__terminal_location"},
+                        {data:"priority"},
+                        {data:"owner__userprofile__username_cn"},
+                        {data:"department__department_name"},
+                        {data:"status"},
+                        {data:"cdate"}
+            ],
+            "order": [[8, 'desc']]
+            });
+        $("div.dataTables_filter").css({display: "inline", "float": "right"})
+        $("div.dataTables_length").css({display: "inline"})
+
+        var default_option = '<option value="" selected="selected">-----</option>'
+
+        $("div.status_filter").html('<label>故障状态：</label>' +
+                                        '<select class="btn btn-default" id="status_filter">' + default_option + '</select>');
+        $("div.status_filter").css({display: "inline","float": "right", "padding-right":"15px"});
+
+        $("div.priority_filter").html('<label>优先级：</label>' +
+                                        '<select class="btn btn-default" id="priority_filter">' + default_option + '</select>');
+        $("div.priority_filter").css({display: "inline","float": "right", "padding-right":"15px"});
+
+        $("div.department_filter").html('<label>处理部门：</label>' +
+                                        '<select class="btn btn-default" id="dep_filter">' + default_option + '</select>');
+        $("div.department_filter").css({display: "inline","float": "right","padding-right":"15px"});
+
+        $("div.owner_filter").html('<label>显示全部：</label>' +
+                                        '<input id="owner_filter" type="checkbox"/>');
+        $("div.owner_filter").css({display: "inline","float": "right","padding-right":"15px"});
+
+        $("div.problem_filter").html('<label>问题分类：</label>' +
+                                        '<select class="btn btn-default" id="problem_filter">' + default_option + '</select>');
+        $("div.problem_filter").css({display: "inline","float": "right","padding-right":"15px"});
+
+        $("div.create_new").html('<button id="create_new" class="btn btn-info">新 建 故 障</button>');
+        $("div.create_new").css({display: "inline","padding-right":"15px"})
+
+
+        $("#priority_filter,#status_filter,#dep_filter, #owner_filter, #problem_filter").on("change",function(){table.draw();})
+
+        {% for option in prioritys %}
+            $("#priority_filter").append("<option value='{{ option.level }}'>{{ option.remark }}")
+        {% endfor %}
+
+        {% for option in statuses %}
+            $("#status_filter").append("<option value='{{ option.0 }}'>{{  option.1 }}")
+        {% endfor %}
+
+        {% for option in deps %}
+            $("#dep_filter").append("<option value='{{ option.id }}'>{{ option.department_name }}")
+        {% endfor %}
+
+        {% for option in problems %}
+            $("#problem_filter").append("<option value='{{ option.id }}'>{{ option.brief }}")
+        {% endfor %}
+
+        $("div.create_new button").click(function(){
+            location.href='{% url 'ticketmgr:create_incident' %}';
+        })
+    })
+    </script>
+
+{% endblock %}
+
+{% block top_button %}
+    <div class="pull-left" style="padding-top: 10px">
+        <button class="btn btn-info btn-md"  onclick="location='{% url 'ticketmgr:create_incident' %}'">新 建 故 障</button>
+    </div>
+{% endblock %}
+
 {% block content %}
-{#    <button type="button" data-toggle="modal" data-target="#myModal">Launch modal</button>#}
 
-{#<h2> Incident Index </h2>#}
-
-        <table class="table table-hover">
+        <table id="incident_table" class="table table-hover" cellspacing="0" width="100%">
             <thead>
                 <tr class="info">
                     <th>故障编号</th>
@@ -13,58 +110,14 @@
                     <th>设备名称</th>
                     <th>安装地址</th>
                     <th>紧急程度</th>
-                    <th>创建日期</th>
-                    <th>更新日期</th>
-                    <th>所有人</th>
-                    <th>所属部门</th>
-                    <th>创建人</th>
+{#                    <th>创建日期</th>#}
+{#                    <th>更新日期</th>#}
+                    <th>责任人</th>
+                    <th>处理部门</th>
                     <th>故障状态</th>
+                    <th>创建日期</th>
                 </tr>
             </thead>
-            <tbody>
-                {% if incidents %}
-                    {% for incident in incidents %}
-                        <tr>
-                            <td><a href="{% url 'ticketmgr:show_ticket' incident.id %}">{{ incident.id }}</a></td>
-                            <td>{{ incident.terminal_no.terminal_no }}</td>
-                            <td>{{ incident.terminal_no.terminal_name }}</td>
-                            <td>{{ incident.terminal_no.terminal_location }}</td>
-                            <td>{{ incident.priority }}</td>
-                            <td>{{ incident.cdate|date:"Y-m-d" }}</td>
-                            <td>{{ incident.upddate|date:"Y-m-d" }}</td>
-                            <td>{{ incident.owner.userprofile.username_cn }}</td>
-                            <td>{{ incident.department }}</td>
-                            <td>{{ incident.creator.userprofile.username_cn }}</td>
-                            <td>{{ incident.get_status_display }}</td>
-                        </tr>
-                    {% endfor %}
-                {% endif %}
-            </tbody>
         </table>
-
-    <div class="row">
-    <span class="col-md-1">
-        <button class="btn btn-primary" onclick="location='{% url 'ticketmgr:create_incident' %}'">Create New</button>
-    </span>
-
-    <span class="col-md-3 col-md-offset-8">
-    <div class="pagination">
-        <span class="step-links">
-            {% if incidents.has_previous %}
-                <a href="?page={{ incidents.previous_page_number }}">&lt;&lt;&lt;Previous</a>
-            {% endif %}
-
-            <span class="current">
-                Page {{ incidents.number }} of {{ incidents.paginator.num_pages }}
-            </span>
-
-            {% if incidents.has_next %}
-                <a href="?page={{ incidents.next_page_number }}">Next&gt;&gt;&gt;</a>
-            {% endif %}
-        </span>
-    </div>
-    </div>
-    </span>
-    </div>
 
 {% endblock %}

@@ -4,14 +4,14 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-priorityType = (('0', '一般'), ('1', '加急'), ('2', '紧急'), ('3', '灾难'))
-
-statusType = (('0', 'Created'),
-              ('1', 'Waiting'),
-              ('2', 'Resolved'),
-              ('3', 'Pending'),
-              ('4', 'Handling'),
-              ('5', 'Closed'))
+priorityType = (('1', '普通'), ('2', '加急'), ('3', '紧急'), ('4', '灾难'))
+actionType = (('1', '解决'), ('2', '接手'), ('3', '搁置'), ('4', '转出'), ('5', '重开'))
+statusType = (('0', '新建'),
+              ('1', '已解决'),
+              ('2', '处理中'),
+              ('3', '搁置中'),
+              ('4', '等待接手'),
+              ('5', '已重开'))
 
 
 class BaseDepartment(models.Model):
@@ -41,6 +41,7 @@ class BaseTerminalInfo(models.Model):
     terminal_name = models.CharField(max_length=60)
     terminal_location = models.CharField(max_length=60)
     install_time = models.DateField(auto_now=True)
+    maintainer = models.ForeignKey(User)
 
     def __unicode__(self):
         return self.terminal_name
@@ -56,6 +57,22 @@ class BaseTicket(models.Model):
     status = models.CharField(max_length=20, choices=statusType)
     priority = models.ForeignKey(BasePriority)
     department = models.ForeignKey(BaseDepartment)
+
+    def notify_user(self,action_type):
+        raise NotImplementedError
+
+    class Meta:
+        abstract = True
+
+
+class BaseAction(models.Model):
+    action_type = models.CharField(max_length=30, choices=actionType)
+    action_brief = models.CharField(max_length=64, verbose_name="Action Brief")
+    action_detail = models.TextField(max_length=256, blank=True, verbose_name="Action Detail")
+    action_time = models.DateTimeField(auto_now=True)
+
+    def update(self, **kwargs):
+        self.__dict__.update(kwargs)
 
     class Meta:
         abstract = True

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from functools import wraps
 
 from django.conf import settings
@@ -6,7 +7,7 @@ from django.shortcuts import resolve_url
 from django.utils.decorators import available_attrs
 
 from django.utils.six.moves.urllib.parse import urlparse
-from app.ticketmgr.models import Incident
+from app.ticketmgr.models import Incident, Problem
 
 
 def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
@@ -37,12 +38,17 @@ def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIE
     return decorator
 
 
-def role_required(role, login_url):
+def role_required(role, ticket_type, login_url):
     def check_permission(user, incident_id):
+        if ticket_type == "incident":
+            _class = Incident
+        elif ticket_type == "problem":
+            _class = Problem
+
         if role == "creator":
-            role_username = Incident.objects.get(pk=incident_id).creator.username
+            role_username = _class.objects.get(pk=incident_id).creator.username
         elif role == "owner":
-            role_username = Incident.objects.get(pk=incident_id).owner.username
+            role_username = _class.objects.get(pk=incident_id).owner.username
         else:
             role_username = ""
         print user.username

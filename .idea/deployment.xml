@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="bozong237">
+    <serverData>
+      <paths name="bozong237">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/django_ito" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/app/ticketmgr/migrations" />
+            <excludedPath local="true" path="$PROJECT_DIR$/app/comm/migrations" />
+            <excludedPath local="true" path="$PROJECT_DIR$/app/errorMonitor/migrations" />
+            <excludedPath local="true" path="$PROJECT_DIR$/app/issuemgr/migrations" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>

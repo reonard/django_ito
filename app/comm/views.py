@@ -33,13 +33,29 @@ def get_owner(request):
         try:
             department = request.GET.get('department', None)
             owner_hint = request.GET.get('owner_hint', None)
-            dep_user_set = BaseDepartment.objects.get(department_name=department).userprofile_set
+            dep_user_set = BaseDepartment.objects.get(id=department).userprofile_set
             target_user = dep_user_set.filter(username_cn__contains=owner_hint).values("username_cn")
             user_list = map(lambda x: x['username_cn'], target_user)
             print user_list
             resdata['user_list'] = user_list
-        except:
+        except Exception, e:
+            print e
             resdata['user_list'] = ""
         finally:
             return HttpResponse(dumps(resdata), content_type='application/json')
-            # return HttpResponse(user_list, content_type='application/json')
+
+
+def get_maintainer(request):
+    if request.method == 'GET':
+        resdata = {}
+        try:
+            terminal_no = request.GET.get('terminal_no', None)
+            print terminal_no
+            maintainer = BaseTerminalInfo.objects.get(terminal_no=terminal_no).maintainer.userprofile.username_cn
+            resdata['maintainer'] = maintainer
+            print(resdata)
+        except Exception, e:
+            print e
+            resdata['maintainer'] = ""
+        finally:
+            return HttpResponse(dumps(resdata), content_type='application/json')

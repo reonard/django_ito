@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app.comm',
     'app.ticketmgr',
+    'app.issuemgr',
     'app.errorMonitor'
 ]
 
@@ -51,6 +52,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 ]
 
 ROOT_URLCONF = 'django_ito.urls'
@@ -108,6 +110,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+TEMPLATE_CONTEXT_PROCESSORS = {
+    # "django.contrib.auth.context_processors.auth",
+    }
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
@@ -136,3 +142,17 @@ LOGIN_REDIRECT_URL = '/ticketmgr/index/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+
+EMAIL_HOST = 'smtp.163.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'reonard@163.com'
+EMAIL_HOST_PASSWORD = 'o08987378'
+
+
+
+BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'
+
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['json']

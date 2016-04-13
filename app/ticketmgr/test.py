@@ -62,9 +62,34 @@
 # a.update_s(kk="c")
 # print
 # print a.__dict__
+#
+# from app.comm.global_settings import MAIL_TEMPLATE
+# from app.ticketmgr.models import Incident
+# print MAIL_TEMPLATE["new_incident"].format(incident="你好")incident = Incident.objects.all()
+import copy
 
+#Supper
 
+# class A(object):
+#     def __new__(cls, *args, **kwargs):
+#         print "A"
+#         return super(A, cls).__new__(cls, *args, **kwargs)
+#
+# class Singleton(A):
+#     def __new__(cls, *args, **kw):
+#         if not hasattr(cls, '_instance'):
+#             orig = super(Singleton, cls)
+#             print cls
+#             print orig
+#             print orig == A
+#             cls._instance = orig.__new__(cls, *args, **kw)
+#         return cls._instance
+#
+# class MyClass(Singleton):
+#     a = 1
+#
+# a=MyClass()
+# b=MyClass()
+#
+# print a is b
 
-import MySQLdb
-
-con  = MySQLdb.connect("127.0.0.1", '')

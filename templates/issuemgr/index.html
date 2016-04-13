@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block header %}
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static "css/datatables.css" %}"><script type="text/javascript" src="https://cdn.datatables.net/t/bs-3.3.6/jq-2.2.0,dt-1.10.11/datatables.min.js"></script>
+<script>
+
+    $(function()
+    {
+        var table = $("#problem_table").dataTable({
+            "processing":false,
+            "dom": '<"#"lf><t>ip',
+            "serverSide":true,
+            "ajax":"/issuemgr/get_problem_list/",
+            "columns": [
+                        {data:"id" ,
+                            "render": function(data){
+                                return '<a href=/issuemgr/detail/'+data+'>'+data+'</a>'},
+                            "targets": 0},
+                        {data:"priority"},
+                        {data:"owner__userprofile__username_cn"},
+                        {data:"department__department_name"},
+                        {data:"creator__userprofile__username_cn"},
+                        {data:"status"}
+            ],
+            "order": [[0, 'asc']]
+            });
+        $("div.dataTables_filter").css({display: "inline", "float": "right"})
+        $("div.dataTables_length").css({display: "inline"})
+    })
+    </script>
+{% endblock %}
+
+
+{% block top_button %}
+    <div class="pull-left" style="padding-top: 10px">
+        <button class="btn btn-info btn-md" onclick="location='{% url 'issuemgr:create_problem' %}'">新 建 问 题</button>
+    </div>
+{% endblock %}
+
+{% block content %}
+        <table id="problem_table" class="table table-hover" cellspacing="0" width="100%">
+            <thead>
+                <tr class="info">
+                    <th>问题编号</th>
+                    <th>紧急程度</th>
+                    <th>所有人</th>
+                    <th>所属部门</th>
+                    <th>创建人</th>
+                    <th>问题状态</th>
+                </tr>
+            </thead>
+        </table>
+{% endblock %}
